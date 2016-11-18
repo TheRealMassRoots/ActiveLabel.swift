@@ -26,7 +26,10 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
     open var urlMaximumLength: Int?
     
     open var configureLinkAttribute: ConfigureLinkAttribute?
-
+    
+    @IBInspectable open var mentionFont: UIFont? {
+        didSet { updateTextStorage(parseText: false) }
+    }
     @IBInspectable open var mentionColor: UIColor = .blue {
         didSet { updateTextStorage(parseText: false) }
     }
@@ -34,6 +37,10 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
         didSet { updateTextStorage(parseText: false) }
     }
     @IBInspectable open var mentionSelectedBackgroundColor: UIColor = .clear {
+        didSet { updateTextStorage(parseText: false) }
+    }
+    
+    @IBInspectable open var hashtagFont: UIFont? {
         didSet { updateTextStorage(parseText: false) }
     }
     @IBInspectable open var hashtagColor: UIColor = .blue {
@@ -45,6 +52,10 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
     @IBInspectable open var hashtagSelectedBackgroundColor: UIColor = .clear {
         didSet { updateTextStorage(parseText: false) }
     }
+    
+    @IBInspectable open var URLFont: UIFont? {
+        didSet { updateTextStorage(parseText: false) }
+    }
     @IBInspectable open var URLColor: UIColor = .blue {
         didSet { updateTextStorage(parseText: false) }
     }
@@ -52,6 +63,10 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
         didSet { updateTextStorage(parseText: false) }
     }
     @IBInspectable open var URLSelectedBackgroundColor: UIColor = .clear {
+        didSet { updateTextStorage(parseText: false) }
+    }
+    
+    @IBInspectable open var customFont: [ActiveType : UIColor] = [:] {
         didSet { updateTextStorage(parseText: false) }
     }
     open var customColor: [ActiveType : UIColor] = [:] {
@@ -63,6 +78,7 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
     open var customSelectedBackgroundColor: [ActiveType : UIColor] = [:] {
         didSet { updateTextStorage(parseText: false) }
     }
+    
     @IBInspectable open var lineSpacing: Float = 0 {
         didSet { updateTextStorage(parseText: false) }
     }
@@ -325,10 +341,18 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
         for (type, elements) in activeElements {
 
             switch type {
-            case .mention: attributes[NSForegroundColorAttributeName] = mentionColor
-            case .hashtag: attributes[NSForegroundColorAttributeName] = hashtagColor
-            case .url: attributes[NSForegroundColorAttributeName] = URLColor
-            case .custom: attributes[NSForegroundColorAttributeName] = customColor[type] ?? defaultCustomColor
+            case .mention:
+                attributes[NSForegroundColorAttributeName] = mentionColor
+                attributes[NSFontAttributeName] = mentionFont ?? font
+            case .hashtag:
+                attributes[NSForegroundColorAttributeName] = hashtagColor
+                attributes[NSFontAttributeName] = hashtagFont ?? font
+            case .url:
+                attributes[NSForegroundColorAttributeName] = URLColor
+                attributes[NSFontAttributeName] = URLFont ?? font
+            case .custom:
+                attributes[NSForegroundColorAttributeName] = customColor[type] ?? defaultCustomColor
+                attributes[NSFontAttributeName] = customFont[type] ?? font
             }
             
             if let highlightFont = hightlightFont {
@@ -402,6 +426,17 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
         var attributes = textStorage.attributes(at: 0, effectiveRange: nil)
         let type = selectedElement.type
 
+        switch type {
+        case .mention:
+            attributes[NSFontAttributeName] = mentionFont ?? font
+        case .hashtag:
+            attributes[NSFontAttributeName] = hashtagFont ?? font
+        case .url:
+            attributes[NSFontAttributeName] = URLFont ?? font
+        case .custom:
+            attributes[NSFontAttributeName] = customFont[type] ?? font
+        }
+        
         if isSelected {
             let selectedColor: UIColor
             let selectedBackground: UIColor
@@ -417,8 +452,9 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
                 selectedBackground = URLSelectedBackgroundColor
             case .custom:
                 let possibleSelectedColor = customSelectedColor[selectedElement.type] ?? customColor[selectedElement.type]
+                let possibleSelectedBackgroundColor = customSelectedBackgroundColor[selectedElement.type]
                 selectedColor = possibleSelectedColor ?? defaultCustomColor
-                selectedBackground = possibleSelectedColor ?? defaultCustomBackgroundColor
+                selectedBackground = possibleSelectedBackgroundColor ?? defaultCustomBackgroundColor
             }
             attributes[NSForegroundColorAttributeName] = selectedColor
             attributes[NSBackgroundColorAttributeName] = selectedBackground
