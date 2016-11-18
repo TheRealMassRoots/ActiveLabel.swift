@@ -33,10 +33,16 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
     @IBInspectable open var mentionSelectedColor: UIColor? {
         didSet { updateTextStorage(parseText: false) }
     }
+    @IBInspectable open var mentionSelectedBackgroundColor: UIColor = .clear {
+        didSet { updateTextStorage(parseText: false) }
+    }
     @IBInspectable open var hashtagColor: UIColor = .blue {
         didSet { updateTextStorage(parseText: false) }
     }
     @IBInspectable open var hashtagSelectedColor: UIColor? {
+        didSet { updateTextStorage(parseText: false) }
+    }
+    @IBInspectable open var hashtagSelectedBackgroundColor: UIColor = .clear {
         didSet { updateTextStorage(parseText: false) }
     }
     @IBInspectable open var URLColor: UIColor = .blue {
@@ -45,10 +51,16 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
     @IBInspectable open var URLSelectedColor: UIColor? {
         didSet { updateTextStorage(parseText: false) }
     }
+    @IBInspectable open var URLSelectedBackgroundColor: UIColor = .clear {
+        didSet { updateTextStorage(parseText: false) }
+    }
     open var customColor: [ActiveType : UIColor] = [:] {
         didSet { updateTextStorage(parseText: false) }
     }
     open var customSelectedColor: [ActiveType : UIColor] = [:] {
+        didSet { updateTextStorage(parseText: false) }
+    }
+    open var customSelectedBackgroundColor: [ActiveType : UIColor] = [:] {
         didSet { updateTextStorage(parseText: false) }
     }
     @IBInspectable open var lineSpacing: Float = 0 {
@@ -231,6 +243,7 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
     // MARK: - private properties
     fileprivate var _customizing: Bool = true
     fileprivate var defaultCustomColor: UIColor = .black
+    fileprivate var defaultCustomBackgroundColor: UIColor = .clear
     
     internal var mentionTapHandler: ((String) -> ())?
     internal var hashtagTapHandler: ((String) -> ())?
@@ -391,22 +404,37 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
 
         if isSelected {
             let selectedColor: UIColor
+            let selectedBackground: UIColor
             switch type {
-            case .mention: selectedColor = mentionSelectedColor ?? mentionColor
-            case .hashtag: selectedColor = hashtagSelectedColor ?? hashtagColor
-            case .url: selectedColor = URLSelectedColor ?? URLColor
+            case .mention:
+                selectedColor = mentionSelectedColor ?? mentionColor
+                selectedBackground = mentionSelectedBackgroundColor
+            case .hashtag:
+                selectedColor = hashtagSelectedColor ?? hashtagColor
+                selectedBackground = hashtagSelectedBackgroundColor
+            case .url:
+                selectedColor = URLSelectedColor ?? URLColor
+                selectedBackground = URLSelectedBackgroundColor
             case .custom:
                 let possibleSelectedColor = customSelectedColor[selectedElement.type] ?? customColor[selectedElement.type]
                 selectedColor = possibleSelectedColor ?? defaultCustomColor
+                selectedBackground = possibleSelectedColor ?? defaultCustomBackgroundColor
             }
             attributes[NSForegroundColorAttributeName] = selectedColor
-        } else {
+            attributes[NSBackgroundColorAttributeName] = selectedBackground
+        }
+        else {
             let unselectedColor: UIColor
             switch type {
-            case .mention: unselectedColor = mentionColor
-            case .hashtag: unselectedColor = hashtagColor
-            case .url: unselectedColor = URLColor
-            case .custom: unselectedColor = customColor[selectedElement.type] ?? defaultCustomColor
+            case .mention:
+                unselectedColor = mentionColor
+            case .hashtag:
+                unselectedColor = hashtagColor
+            case .url:
+                unselectedColor = URLColor
+                attributes[NSBackgroundColorAttributeName] = UIColor.clear
+            case .custom:
+                unselectedColor = customColor[selectedElement.type] ?? defaultCustomColor
             }
             attributes[NSForegroundColorAttributeName] = unselectedColor
         }
