@@ -66,7 +66,7 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
         didSet { updateTextStorage(parseText: false) }
     }
     
-    @IBInspectable open var customFont: [ActiveType : UIColor] = [:] {
+    @IBInspectable open var customFont: [ActiveType : UIFont] = [:] {
         didSet { updateTextStorage(parseText: false) }
     }
     open var customColor: [ActiveType : UIColor] = [:] {
