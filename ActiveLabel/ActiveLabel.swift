@@ -75,6 +75,10 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
     open var customSelectedColor: [ActiveType : UIColor] = [:] {
         didSet { updateTextStorage(parseText: false) }
     }
+    open var customSelectedBackgroundColor: [ActiveType : UIColor] = [:] {
+        didSet { updateTextStorage(parseText: false) }
+    }
+
     @IBInspectable public var lineSpacing: CGFloat = 0 {
         didSet { updateTextStorage(parseText: false) }
     }
